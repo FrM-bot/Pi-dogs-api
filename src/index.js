@@ -24,7 +24,7 @@ const fetch = require('node-fetch');
 const PORT = process.env.PORT || 3001
 // Syncing all the models at once.
 const start = async () => {
-  // console.log(process.env.NODE_ENV)
+  console.log(process.env.NODE_ENV, process.env.ALLOW_URL)
   const config = process.env.NODE_ENV !== 'development' ? { alter: true } : { force: true, alter: true }
 
   await sequelize.sync(config)
