@@ -17,14 +17,17 @@
 //     =====`-.____`.___ \_____/___.-`___.-'=====
 //                       `=---='
 //     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-const server = require('./src/app.js');
-const { sequelize, Dog, Temperaments } = require('./src/db.js');
+const server = require('./app.js');
+const { sequelize, Dog, Temperaments } = require('./db.js');
 const fetch = require('node-fetch');
 
-
+const PORT = process.env.PORT || 3001
 // Syncing all the models at once.
-(async () => {
-  await sequelize.sync({ force: true, alter: true });
+const start = async () => {
+  // console.log(process.env.NODE_ENV)
+  const config = process.env.NODE_ENV !== 'development' ? { alter: true } : { force: true, alter: true }
+
+  await sequelize.sync(config)
 
   const dogsSQL = await Dog.findAll({ include: Temperaments });
   
@@ -60,11 +63,13 @@ const fetch = require('node-fetch');
         dogCreated.addTemperaments(temperamentsIDs)
     })
 }
-  server.listen(3001, () => {
-    console.log('%s listening at http://localhost:3001', 'server'); // eslint-disable-line no-console
+  server.listen(PORT, () => {
+    console.log(`%s listening at http://localhost:${PORT}`, 'server'); // eslint-disable-line no-console
   });
   // Code here
-})();
+}
+
+start()
 // sequelize.sync({ alter: true, force: true }).then(() => {
   
 // });
