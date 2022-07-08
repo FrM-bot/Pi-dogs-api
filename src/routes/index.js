@@ -8,37 +8,9 @@ const { Op } = require("sequelize");
 const router = Router();
 
 router.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.send('Server Dogs');
 })
 
-const paginateData = (data, page, QUANTITY) => {
-    const dogsPageNumber = page || 1
-    const to = QUANTITY * dogsPageNumber
-    const from = to - QUANTITY
-    return data.slice(from, to)
-}
-
-
-const sortFunction = (dogOne, dogTwo, sortBy, isAscendantBool) => {
-    // if (sortBy === 'weight') {
-    //     if (Number(dogOne[sortBy]?.metric.split('-')[0]) < Number(dogTwo[sortBy]?.metric.split('-')[0])) {
-    //         return isAscendantBool ? 1 : -1
-    //     }
-    //     if (Number(dogOne[sortBy]?.metric.split('-')[0]) > Number(dogTwo[sortBy]?.metric.split('-')[0])) {
-    //         return isAscendantBool ? -1 : 1
-    //     } 
-    //     return 0
-    // }
-    if (dogOne[sortBy] < dogTwo[sortBy]) {
-        return isAscendantBool ? 1 : -1
-    }
-    if (dogOne[sortBy] > dogTwo[sortBy]) {
-        return isAscendantBool ? -1 : 1
-    } 
-    return 0
-}
-
-// 
 
 router.get('/dogs', async (req, res) => {
     try {   
@@ -51,29 +23,6 @@ router.get('/dogs', async (req, res) => {
         const skip = (dogsPageNumber - 1) * QUANTITY
 
         if (filterBy) {
-           
-            // const dogsIds = await Temperaments.findAll()"
-            
-            // User.findAll({
-            //     include: [{
-            //       model: Project,
-            //       through: {
-            //         where: {
-            //           // Here, `completed` is a column present at the junction table
-            //           completed: true
-            //         }
-            //       }
-            //     }]
-            //   });"
-
-            // Fetch 10 instances/rows
-// Project.findAll({ limit: 10 });
-
-// Skip 8 instances/rows
-// Project.findAll({ offset: 8 });
-
-// Skip 5 instances and fetch the 5 after that
-// Project.findAll({ offset: 5, limit: 5 });
 
             const dogsF = await Temperaments.findAll({
                 where: {
@@ -177,7 +126,7 @@ router.get('/dogs', async (req, res) => {
             const { Temperaments, ...data  } = dataValues
             return {
                 ...data,
-                temperaments
+                Temperaments: temperaments
             }
         })
 
@@ -205,7 +154,6 @@ router.post('/dogs', async (req, res) => {
             temperamentsIds,
             ...dogToAdd
         } = dog
-        // console.log(dogToAdd)
 
         const newDog = await Dog.create(dogToAdd)
         await newDog.addTemperaments(temperamentsIds);
@@ -216,7 +164,6 @@ router.post('/dogs', async (req, res) => {
                 temperament
             }
         })
-        // console.log({...newDog.dataValues}, temperaments)
     
         res.status(201).json({ ...newDog.dataValues, Temperaments: temperaments })
     } catch (error) {
