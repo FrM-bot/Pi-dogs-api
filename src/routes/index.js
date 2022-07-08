@@ -16,7 +16,6 @@ router.get('/dogs', async (req, res) => {
     try {   
         const { name: nameToSEarch, page, isAscendant, sortBy='name', filterBy } = req.query
         const isAscendantBool = isAscendant === 'true'
-        console.log({filterBy})
         const QUANTITY = 8
         const isAscDesc = isAscendantBool ? 'DESC' : 'ASC'
         const dogsPageNumber = Number(page) || 1
@@ -121,7 +120,6 @@ router.get('/dogs', async (req, res) => {
         const dogsSQL = await Dog.findAll({ include: Temperaments, order: [[sortBy, isAscDesc]], offset: skip, limit: QUANTITY });
     
         const dataToSEnd = dogsSQL?.map(({dataValues}) => {
-            console.log({dataValues})
             const temperaments = dataValues.Temperaments?.map(({ temperament }) =>temperament)
             const { Temperaments, ...data  } = dataValues
             return {
@@ -180,10 +178,14 @@ router.get('/dogs/:id', async (req, res) => {
         const dogDB = await Dog.findByPk(id, {
             include: Temperaments
         })
-
-        res.status(200).json(dogDB);
+        const { Temperaments: temperaments,  ...dog } = dogDB.dataValues
+        const temperamentsMaped = temperaments?.map(({ dataValues }) => {
+            return dataValues.temperament
+        })
+        // dogDB.dataValues.Temperaments = temperaments
+        // console.log(temperament, dog)
+        res.status(200).json({ ...dog, Temperaments: temperamentsMaped })
     } catch (error) {
-        console.log(error)
         return res.status(404).json({error: 'Dog not found'});
     }
 })
